@@ -1,0 +1,41 @@
+{
+  "name": "fly-paper",
+  "version": "0.1.0",
+  "description": "Automation for Matrix home server moderation",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "tsc && node dist/app.js",
+    "test": "standard **/*.ts | snazzy && tsc && node ./test/index.js | tap-nyan"
+  },
+  "author": "Serra Allgood <serra@allgood.dev>",
+  "license": "CNPLv1+",
+  "repository": {
+    "url": "https://github.com/serra-allgood/matrix-fly-paper"
+  },
+  "keywords": [
+    "Matrix",
+    "home server moderation",
+    "Matrix Protocol",
+    "matrix.org"
+  ],
+  "standard": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint/eslint-plugin"
+    ]
+  },
+  "dependencies": {
+    "matrix-bot-sdk": "^0.3.9"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.3",
+    "@typescript-eslint/eslint-plugin": "^2.1.0",
+    "@typescript-eslint/parser": "^2.1.0",
+    "snazzy": "^8.0.0",
+    "standard": "^14.1.0",
+    "tap-nyan": "^1.1.0",
+    "tap-spec": "^5.0.0",
+    "tape": "^4.11.0",
+    "typescript": "^3.6.2"
+  }
+}
