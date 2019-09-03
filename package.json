@@ -4,14 +4,23 @@
   "description": "Automation for Matrix home server moderation",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
-    "test": "standard **/*.ts | snazzy && tsc && node ./test/index.js | tap-nyan"
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "lint": "standard src/**/*.ts | snazyy",
+    "lintJS": "standard test/**/* | snazzy",
+    "start": "npm run build && node dist/app.js",
+    "test": "node ./test/index.js | tap-spec"
   },
   "author": "Serra Allgood <serra@allgood.dev>",
   "license": "CNPLv1+",
   "repository": {
-    "url": "https://github.com/serra-allgood/matrix-fly-paper"
+    "type": "git",
+    "url": "git+https://github.com/serra-allgood/matrix-fly-paper.git"
   },
+  "bugs": {
+    "url": "https://github.com/serra-allgood/matrix-fly-paper/issues"
+  },
+  "homepage": "https://github.com/serra-allgood/matrix-fly-paper#readme",
   "keywords": [
     "Matrix",
     "home server moderation",
@@ -25,17 +34,22 @@
     ]
   },
   "dependencies": {
-    "matrix-bot-sdk": "^0.3.9"
+    "matrix-bot-sdk": "~> 0.3.9",
+    "yaml": "~> 1.6.0"
   },
   "devDependencies": {
-    "@types/node": "^12.7.3",
-    "@typescript-eslint/eslint-plugin": "^2.1.0",
-    "@typescript-eslint/parser": "^2.1.0",
-    "snazzy": "^8.0.0",
-    "standard": "^14.1.0",
-    "tap-nyan": "^1.1.0",
-    "tap-spec": "^5.0.0",
-    "tape": "^4.11.0",
-    "typescript": "^3.6.2"
+    "@types/node": "~> 12.7.3",
+    "@types/yaml": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "~> 2.1.0",
+    "@typescript-eslint/parser": "~> 2.1.0",
+    "snazzy": "~> 8.0.0",
+    "standard": "~> 14.1.0",
+    "tap-spec": "~> 5.0.0",
+    "tape": "~> 4.11.0",
+    "typescript": "~> 3.5.3"
+  },
+  "engines": {
+    "node": ">= 10.15.3",
+    "npm": ">= 6.11.2"
   }
 }

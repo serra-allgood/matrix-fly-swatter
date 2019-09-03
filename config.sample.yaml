@@ -1,0 +1,10 @@
+server:
+  url: 'https://matrix.org'
+  name: 'matrix.org'
+botUser:
+  accessToken: 'access_token'
+  mxid: '@fly-paper:matrix.org'
+  name: 'FlyPaper'
+  avatar: 'mxc://matrix.org/unique_mxc_id'
+files:
+  syncHistory: './log/sync_history.log'

@@ -1,0 +1,18 @@
+language: node_js
+env:
+- NODE_ENV=development
+before_install:
+- npm i -g npm
+install:
+- npm install
+jobs:
+  include:
+  - name: Build
+    script: npm run build
+    node_js: 10
+  - name: Linter
+    script: npm run lint && npm run lintJS
+    node_js: 10
+  - name: Tests
+    script: npm run test
+    node_js: 10
