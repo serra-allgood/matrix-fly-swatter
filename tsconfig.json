@@ -6,7 +6,6 @@
     "declaration": true,
     "sourceMap": false,
     "outDir": "lib",
-    "rootDir": "./src",
     "removeComments": true,
 
     /* Strict Type-Checking Options */
@@ -24,7 +23,6 @@
 
     /* Module Resolution Options */
     "moduleResolution": "node",
-    "baseUrl": "./src",
     "types": [
       "node",
       "yaml"
@@ -34,5 +32,6 @@
     /* Experimental Options */
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
-  }
+  },
+  "include": ["./src/**/*.ts"]
 }
