@@ -6,11 +6,11 @@ interface IEvent {
 }
 
 export function getServerAclHandler (client: IClient): (
-  currentRoom: string,
+  originRoom: string,
   event: IEvent
 ) => Promise<string[]> {
-  return async (currentRoom: string, event: IEvent): Promise<string[]> => {
-    const rooms = (await client.getJoinedRooms()).filter(room => room !== currentRoom)
+  return async (originRoom: string, event: IEvent): Promise<string[]> => {
+    const rooms = (await client.getJoinedRooms()).filter(room => room !== originRoom)
 
     return Promise.all(
       rooms.map(room => {
