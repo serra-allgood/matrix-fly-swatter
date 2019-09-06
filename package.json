@@ -1,15 +1,16 @@
 {
   "name": "fly-paper",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Automation for Matrix home server moderation",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "clean": "rimraf lib",
+    "build": "npm run clean && tsc",
     "prepublishOnly": "npm run build",
     "lint": "standard src/**/*.ts | snazzy",
     "lintJS": "standard test/**/* | snazzy",
     "start": "npm run build && node dist/app.js",
-    "test": "npm run build && node ./test/**.js | tap-spec"
+    "test": "npm run build && node ./test/**/*.js | tap-spec"
   },
   "author": "Serra Allgood <serra@allgood.dev>",
   "license": "NPLv1+",
@@ -43,6 +44,8 @@
     "@types/yaml": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "~> 2.1.0",
     "@typescript-eslint/parser": "~> 2.1.0",
+    "reduce-flatten": "^2.0.0",
+    "rmrf": "^2.0.2",
     "snazzy": "~> 8.0.0",
     "standard": "~> 14.1.0",
     "tap-spec": "~> 5.0.0",
