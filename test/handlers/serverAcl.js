@@ -7,6 +7,9 @@ const setupClient = (rooms, testers) => {
 
   return () => {
     const client = {
+      getUserId () {
+        return Promise.resolve('@fly-paper:matrix.org')
+      },
       getJoinedRooms () {
         return Promise.resolve(rooms)
       },
@@ -28,7 +31,7 @@ const setupClient = (rooms, testers) => {
   }
 }
 
-const setupCommonConsts = () => {
+const setupCommonConsts = (sender = '@abuse:matrix.org') => {
   const rooms = ['!foo:localhost', '!bar:localhost', '!baz:localhost']
 
   return {
@@ -43,7 +46,8 @@ const setupCommonConsts = () => {
         ]
       },
       room_id: rooms[0],
-      type: 'm.room.server_acl'
+      type: 'm.room.server_acl',
+      user_id: sender
     }
   }
 }
@@ -72,10 +76,22 @@ test('server_acl duplication', async t => {
   client.process(event)
 })
 
-test.skip('filtering out own events', t => {
-  // const { rooms, event } = setupCommonConsts()
-  // const index = 1
-  // const sendStateEvent = (roomID, type, stateKey, content) => {
+test('filtering out own events', t => {
+  t.plan(1)
+  const { rooms, event } = setupCommonConsts('@fly-paper:matrix.org')
 
-  // }
+  const sendStateEvent = (_roomID, _type, _stateKey, _content) => {
+    t.test('this should not have been called', st => {
+      st.plan(1)
+      t.fail('failure')
+    })
+
+    return Promise.resolve('uniqueEventID')
+  }
+
+  const client = setupClient(rooms, { sendStateEvent })()
+  const serverAcl = getServerAclHandler(client)
+  client.on('m.room.server_acl', serverAcl)
+  client.process(event)
+  t.pass('no calls')
 })
