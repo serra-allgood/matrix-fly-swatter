@@ -10,13 +10,14 @@ const setupClient = (rooms, testers) => {
       approvedUsers () {
         return [
           '@admin:matrix.org',
-          '@abuse:matrix.org'
+          '@abuse:matrix.org',
+          '@moderator:matrix.org'
         ]
       },
-      minimumPowerLevel () {
-        return 50
+      minPowerLevel () {
+        return 100
       },
-      getRoomStateEvent (_roomID, _type, _stateKey) {
+      getPowerLevels (_roomID) {
         return Promise.resolve({
           state_default: 50,
           kick: 50,
@@ -63,7 +64,7 @@ const setupClient = (rooms, testers) => {
   }
 }
 
-const setupCommonConsts = (sender = '@abuse:matrix.org') => {
+const setupCommonConsts = (sender = '@admin:matrix.org') => {
   const rooms = ['!foo:localhost', '!bar:localhost', '!baz:localhost']
 
   return {
@@ -125,12 +126,11 @@ test('filtering out own events', t => {
   const serverAcl = getServerAclHandler(client)
   client.on('m.room.server_acl', serverAcl)
   client.process(event)
+
   t.pass('no calls')
 })
 
-test.skip('only respond to approved users', t => {
-  t.plan(3)
-
+test('only respond to approved users', t => {
   const { rooms, event } = setupCommonConsts('@not-approved:matrix.org')
   const sendStateEvent = (_roomID, _type, _stateKey, _content) => {
     t.test('this should not have been called', st => {
@@ -141,54 +141,31 @@ test.skip('only respond to approved users', t => {
     return Promise.resolve('uniqueEventID')
   }
 
-  t.test('when explicit users are configured', st => {
-    t.plan(1)
+  const client = setupClient(rooms, { sendStateEvent })()
+  const serverAcl = getServerAclHandler(client)
+  client.on('m.room.server_acl', serverAcl)
+  client.process(event)
 
-    const client = setupClient(rooms, { sendStateEvent })()
-    const serverAcl = getServerAclHandler(client)
+  t.pass('no calls')
+  t.end()
+})
 
-    client.on('m.room.server_acl', serverAcl)
-    client.process(event)
+test('enforce minimum power level', t => {
+  const { rooms, event } = setupCommonConsts('@moderator:matrix.org')
+  const sendStateEvent = (_roomID, _type, _stateKey, _content) => {
+    t.test('this should not have been called', st => {
+      st.plan(1)
+      t.fail('failure')
+    })
 
-    t.pass('no calls')
-  })
+    return Promise.resolve('uniqueEventID')
+  }
 
-  t.test('when a minimum power level is configured', st => {
-    const approvedUsers = () => null
-    const minimumPowerLevel = () => 50
+  const client = setupClient(rooms, { sendStateEvent })()
+  const serverAcl = getServerAclHandler(client)
+  client.on('m.room.server_acl', serverAcl)
+  client.process(event)
 
-    const client = setupClient(rooms, {
-      sendStateEvent,
-      approvedUsers,
-      minimumPowerLevel
-    })()
-    const serverAcl = getServerAclHandler(client)
-
-    client.on('m.room.server_acl', serverAcl)
-    client.process(event)
-
-    t.pass('no calls')
-  })
-
-  t.test('when both are configured', st => {
-    const approvedUsers = () => {
-      return [
-        '@abuse:matrix.org',
-        '@admin:matrix.org'
-      ]
-    }
-    const minimumPowerLevel = () => 100
-
-    const client = setupClient(rooms, {
-      sendStateEvent,
-      approvedUsers,
-      minimumPowerLevel
-    })()
-    const serverAcl = getServerAclHandler(client)
-
-    client.on('m.room.server_acl', serverAcl)
-    client.process(event)
-
-    t.pass('no calls')
-  })
+  t.pass('no calls')
+  t.end()
 })
