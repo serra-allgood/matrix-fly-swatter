@@ -1,4 +1,4 @@
-# FlyPaper
+# FlyPaper ![Travis CI](https://travis-ci.com/serra-allgood/matrix-fly-paper.svg?branch=master)
 
 ## Remember, life is only chaos for the fly
 
