@@ -7,6 +7,42 @@ const setupClient = (rooms, testers) => {
 
   return () => {
     const client = {
+      approvedUsers () {
+        return [
+          '@admin:matrix.org',
+          '@abuse:matrix.org',
+          '@moderator:matrix.org'
+        ]
+      },
+      minPowerLevel () {
+        return 100
+      },
+      getPowerLevels (_roomID) {
+        return Promise.resolve({
+          state_default: 50,
+          kick: 50,
+          users_default: 0,
+          events_default: 0,
+          redact: 50,
+          users: {
+            '@moderator:matrix.org': 50,
+            '@admin:matrix.org': 100,
+            '@abuse:matrix.org': 50
+          },
+          ban: 50,
+          events: {
+            'm.room.avatar': 50,
+            'm.room.power_levels': 100,
+            'm.room.history_visibility': 100,
+            'm.room.name': 50,
+            'm.room.canonical_alias': 50
+          },
+          invite: 0
+        })
+      },
+      getUserId () {
+        return Promise.resolve('@fly-paper:matrix.org')
+      },
       getJoinedRooms () {
         return Promise.resolve(rooms)
       },
@@ -28,7 +64,7 @@ const setupClient = (rooms, testers) => {
   }
 }
 
-const setupCommonConsts = () => {
+const setupCommonConsts = (sender = '@admin:matrix.org') => {
   const rooms = ['!foo:localhost', '!bar:localhost', '!baz:localhost']
 
   return {
@@ -43,7 +79,8 @@ const setupCommonConsts = () => {
         ]
       },
       room_id: rooms[0],
-      type: 'm.room.server_acl'
+      type: 'm.room.server_acl',
+      user_id: sender
     }
   }
 }
@@ -72,10 +109,63 @@ test('server_acl duplication', async t => {
   client.process(event)
 })
 
-test.skip('filtering out own events', t => {
-  // const { rooms, event } = setupCommonConsts()
-  // const index = 1
-  // const sendStateEvent = (roomID, type, stateKey, content) => {
+test('filtering out own events', t => {
+  t.plan(1)
+  const { rooms, event } = setupCommonConsts('@fly-paper:matrix.org')
 
-  // }
+  const sendStateEvent = (_roomID, _type, _stateKey, _content) => {
+    t.test('this should not have been called', st => {
+      st.plan(1)
+      t.fail('failure')
+    })
+
+    return Promise.resolve('uniqueEventID')
+  }
+
+  const client = setupClient(rooms, { sendStateEvent })()
+  const serverAcl = getServerAclHandler(client)
+  client.on('m.room.server_acl', serverAcl)
+  client.process(event)
+
+  t.pass('no calls')
+})
+
+test('only respond to approved users', t => {
+  const { rooms, event } = setupCommonConsts('@not-approved:matrix.org')
+  const sendStateEvent = (_roomID, _type, _stateKey, _content) => {
+    t.test('this should not have been called', st => {
+      st.plan(1)
+      t.fail('failure')
+    })
+
+    return Promise.resolve('uniqueEventID')
+  }
+
+  const client = setupClient(rooms, { sendStateEvent })()
+  const serverAcl = getServerAclHandler(client)
+  client.on('m.room.server_acl', serverAcl)
+  client.process(event)
+
+  t.pass('no calls')
+  t.end()
+})
+
+test('enforce minimum power level', t => {
+  const { rooms, event } = setupCommonConsts('@moderator:matrix.org')
+  const sendStateEvent = (_roomID, _type, _stateKey, _content) => {
+    t.test('this should not have been called', st => {
+      st.plan(1)
+      t.fail('failure')
+    })
+
+    return Promise.resolve('uniqueEventID')
+  }
+
+  const client = setupClient(rooms, { sendStateEvent })()
+  const serverAcl = getServerAclHandler(client)
+  client.on('m.room.server_acl', serverAcl)
+  client.process(event)
+
+  t.pass('no calls')
+  t.end()
 })
